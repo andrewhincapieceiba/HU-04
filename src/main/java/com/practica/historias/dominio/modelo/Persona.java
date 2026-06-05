@@ -1,5 +1,6 @@
 package com.practica.historias.dominio.modelo;
 
+import com.practica.historias.dominio.excepcion.ExcepcionNegocio;
 import java.time.LocalDate;
 
 public class Persona {
@@ -27,19 +28,19 @@ public class Persona {
 
     private void validarObligatorio(String valor, String mensaje) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException(mensaje);
+            throw new ExcepcionNegocio(mensaje);
         }
     }
 
     private void validarFormatoEmail(String email) {
         if (email == null || !email.contains("@") || !email.contains(".")) {
-            throw new IllegalArgumentException("El correo no tiene un formato válido (ejemplo: usuario@gmail.com)");
+            throw new ExcepcionNegocio("El correo no tiene un formato válido (ejemplo: usuario@gmail.com)");
         }
     }
 
     private void validarFechaNacimiento(LocalDate fecha) {
         if (fecha != null && fecha.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("No se pueden poner fechas futuras en el nacimiento");
+            throw new ExcepcionNegocio("No se pueden poner fechas futuras en el nacimiento");
         }
     }
 

@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.6'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'com.practica'
@@ -23,17 +23,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Driver para PostgreSQL (¡ESTO SOLUCIONA EL ERROR!)
+    // Driver para PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
 
-    // Lombok para ahorrar código (Getters, Setters, etc.)
+    // Lombok para ahorrar código
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Herramientas para no tener que reiniciar el server manualmente
+    // Herramientas de desarrollo
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // Pruebas unitarias y de integración
+    // Pruebas unitarias y de integración (¡Aquí se restauran tus imports!)
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
