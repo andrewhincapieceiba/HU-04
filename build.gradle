@@ -19,21 +19,17 @@ repositories {
 }
 
 dependencies {
-    // Corazón de Spring Boot para Web y JPA
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Driver para PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
 
-    // Lombok para ahorrar código
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Herramientas de desarrollo
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // Pruebas unitarias y de integración (¡Aquí se restauran tus imports!)
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
