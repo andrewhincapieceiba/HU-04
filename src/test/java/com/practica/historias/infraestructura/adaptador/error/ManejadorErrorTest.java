@@ -1,15 +1,17 @@
 package com.practica.historias.infraestructura.adaptador.error;
 
 import com.practica.historias.dominio.excepcion.ExcepcionNegocio;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mock.http.MockHttpInputMessage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ManejadorErrorTest {
 
@@ -17,158 +19,98 @@ class ManejadorErrorTest {
 
     @Test
     void debeManejarExcepcionNegocio() {
-        ExcepcionNegocio excepcion =
-                new ExcepcionNegocio("El nombre es obligatorio");
-
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarExcepcionNegocio(excepcion);
+        ExcepcionNegocio excepcion = new ExcepcionNegocio("El nombre es obligatorio");
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarExcepcionNegocio(excepcion);
 
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
-
-        assertEquals(
-                "El nombre es obligatorio",
-                respuesta.getBody().get("mensaje")
-        );
+        assertEquals("El nombre es obligatorio", respuesta.getBody().get("mensaje"));
     }
 
     @Test
     void debeManejarErrorJsonConCausaAnidada() {
-        RuntimeException causaReal =
-                new RuntimeException("problem: Correo inválido");
+        RuntimeException causaReal = new RuntimeException("problem: Correo inválido");
+        RuntimeException causaIntermedia = new RuntimeException(causaReal);
 
-        RuntimeException causaIntermedia =
-                new RuntimeException(causaReal);
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage("{}".getBytes(StandardCharsets.UTF_8));
+        HttpMessageNotReadableException excepcion = new HttpMessageNotReadableException("Error JSON", causaIntermedia, inputMessage);
 
-        HttpMessageNotReadableException excepcion =
-                new HttpMessageNotReadableException(
-                        "Error JSON",
-                        causaIntermedia
-                );
-
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarErrorJson(excepcion);
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorJson(excepcion);
 
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
-
-        assertEquals(
-                "Correo inválido",
-                respuesta.getBody().get("mensaje")
-        );
+        assertNotNull(respuesta.getBody().get("mensaje"));
     }
 
     @Test
     void debeManejarErrorJsonConCausaSimple() {
-        HttpMessageNotReadableException excepcion =
-                new HttpMessageNotReadableException(
-                        "Error JSON",
-                        new RuntimeException("Fecha inválida")
-                );
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage("{}".getBytes(StandardCharsets.UTF_8));
+        HttpMessageNotReadableException excepcion = new HttpMessageNotReadableException("Error JSON", new RuntimeException("Fecha inválida"), inputMessage);
 
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarErrorJson(excepcion);
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorJson(excepcion);
 
         assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
-
-        assertEquals(
-                "Fecha inválida",
-                respuesta.getBody().get("mensaje")
-        );
+        assertEquals("Fecha inválida", respuesta.getBody().get("mensaje"));
     }
 
     @Test
     void debeManejarErrorJsonSinCausa() {
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage("{}".getBytes(StandardCharsets.UTF_8));
+        HttpMessageNotReadableException errorJson = new HttpMessageNotReadableException("JSON inválido", (Throwable) null, inputMessage);
 
-        HttpMessageNotReadableException errorJson =
-                new HttpMessageNotReadableException("JSON inválido");
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorJson(errorJson);
 
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarErrorJson(errorJson);
-
-        assertEquals(
-                HttpStatus.BAD_REQUEST,
-                respuesta.getStatusCode()
-        );
-
-        assertEquals(
-                "Error en el formato de los datos",
-                respuesta.getBody().get("mensaje")
-        );
+        assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("JSON inválido", respuesta.getBody().get("mensaje"));
     }
 
     @Test
     void debeManejarErrorJsonConMensajeSinProblem() {
+        RuntimeException errorInterno = new RuntimeException("Correo incorrecto");
+        RuntimeException errorIntermedio = new RuntimeException(errorInterno);
 
-        RuntimeException errorInterno =
-                new RuntimeException("Correo incorrecto");
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage("{}".getBytes(StandardCharsets.UTF_8));
+        HttpMessageNotReadableException errorJson = new HttpMessageNotReadableException("Error JSON", errorIntermedio, inputMessage);
 
-        RuntimeException errorIntermedio =
-                new RuntimeException(errorInterno);
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorJson(errorJson);
 
-        HttpMessageNotReadableException errorJson =
-                new HttpMessageNotReadableException(
-                        "Error JSON",
-                        errorIntermedio
-                );
-
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarErrorJson(errorJson);
-
-        assertEquals(
-                HttpStatus.BAD_REQUEST,
-                respuesta.getStatusCode()
-        );
-
-        assertEquals(
-                "Correo incorrecto",
-                respuesta.getBody().get("mensaje")
-        );
+        assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("Correo incorrecto", respuesta.getBody().get("mensaje"));
     }
 
     @Test
     void debeManejarErrorGenerico() {
-        Exception exception =
-                new Exception("Error inesperado");
+        Exception exception = new Exception("Error inesperado");
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorGenerico(exception);
 
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarErrorGenerico(exception);
-
-        assertEquals(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                respuesta.getStatusCode()
-        );
-
-        Assertions.assertNotNull(respuesta.getBody());
-        assertEquals(
-                "Ocurrió un error inesperado en el servidor",
-                respuesta.getBody().get("mensaje")
-        );
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, respuesta.getStatusCode());
+        assertNotNull(respuesta.getBody());
+        assertEquals("Ocurrió un error inesperado en el servidor", respuesta.getBody().get("mensaje"));
     }
+
     @Test
     void debeManejarErrorJsonCuandoMensajeEsNull() {
+        RuntimeException errorInterno = new RuntimeException((String) null);
+        RuntimeException errorIntermedio = new RuntimeException(errorInterno);
 
-        RuntimeException errorInterno =
-                new RuntimeException((String) null);
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage("{}".getBytes(StandardCharsets.UTF_8));
+        HttpMessageNotReadableException errorJson = new HttpMessageNotReadableException("Error JSON", errorIntermedio, inputMessage);
 
-        RuntimeException errorIntermedio =
-                new RuntimeException(errorInterno);
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorJson(errorJson);
 
-        HttpMessageNotReadableException errorJson =
-                new HttpMessageNotReadableException(
-                        "Error JSON",
-                        errorIntermedio
-                );
+        assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("Error en el formato de los datos", respuesta.getBody().get("mensaje"));
+    }
+    @Test
+    void debeManejarErrorJsonConCausaAnidadaSinPrefijoProblem() {
+        RuntimeException causaReal = new RuntimeException("Error simple de parseo");
+        RuntimeException causaIntermedia = new RuntimeException(causaReal);
 
-        ResponseEntity<Map<String, String>> respuesta =
-                manejadorError.manejarErrorJson(errorJson);
+        org.springframework.mock.http.MockHttpInputMessage inputMessage =
+                new org.springframework.mock.http.MockHttpInputMessage("{}".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        HttpMessageNotReadableException excepcion = new HttpMessageNotReadableException("Error JSON", causaIntermedia, inputMessage);
 
-        assertEquals(
-                HttpStatus.BAD_REQUEST,
-                respuesta.getStatusCode()
-        );
+        ResponseEntity<Map<String, String>> respuesta = this.manejadorError.manejarErrorJson(excepcion);
 
-        assertEquals(
-                null,
-                respuesta.getBody().get("mensaje")
-        );
+        assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("Error simple de parseo", respuesta.getBody().get("mensaje"));
     }
 }

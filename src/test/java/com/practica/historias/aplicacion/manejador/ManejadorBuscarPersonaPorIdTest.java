@@ -21,36 +21,18 @@ class ManejadorBuscarPersonaPorIdTest {
 
     @BeforeEach
     void setUp() {
-
-        this.servicioBuscarPersonaPorId =
-                Mockito.mock(ServicioBuscarPersonaPorId.class);
-
+        this.servicioBuscarPersonaPorId = Mockito.mock(ServicioBuscarPersonaPorId.class);
         this.fabricaPersona = new FabricaPersona();
-
-        this.manejador =
-                new ManejadorBuscarPersonaPorId(
-                        servicioBuscarPersonaPorId,
-                        fabricaPersona
-                );
+        this.manejador = new ManejadorBuscarPersonaPorId(servicioBuscarPersonaPorId, fabricaPersona);
     }
 
     @Test
     void debeRetornarPersonaDTO() {
+        Persona persona = new Persona(1L, "Andrew", "Gomez", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        Persona persona =
-                new Persona(
-                        1L,
-                        "Andrew",
-                        "Gomez",
-                        "andrew@mail.com",
-                        LocalDate.of(2000,1,1)
-                );
+        when(this.servicioBuscarPersonaPorId.ejecutar(1L)).thenReturn(persona);
 
-        when(this.servicioBuscarPersonaPorId.ejecutar(1L))
-                .thenReturn(persona);
-
-        PersonaDTO resultado =
-                this.manejador.ejecutar(1L);
+        PersonaDTO resultado = this.manejador.ejecutar(1L);
 
         assertEquals(1L, resultado.getId());
         assertEquals("Andrew", resultado.getNombre());

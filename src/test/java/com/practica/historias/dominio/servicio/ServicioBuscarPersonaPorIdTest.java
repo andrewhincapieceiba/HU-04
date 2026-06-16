@@ -19,27 +19,16 @@ class ServicioBuscarPersonaPorIdTest {
     @BeforeEach
     void setUp() {
         this.personaRepositorio = Mockito.mock(PersonaRepositorio.class);
-        this.servicioBuscarPersonaPorId =
-                new ServicioBuscarPersonaPorId(personaRepositorio);
+        this.servicioBuscarPersonaPorId = new ServicioBuscarPersonaPorId(personaRepositorio);
     }
 
     @Test
     void debeRetornarPersonaPorId() {
+        Persona persona = new Persona(1L, "Andrew", "Gomez", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        Persona persona =
-                new Persona(
-                        1L,
-                        "Andrew",
-                        "Gomez",
-                        "andrew@mail.com",
-                        LocalDate.of(2000,1,1)
-                );
+        when(this.personaRepositorio.buscarPorId(1L)).thenReturn(persona);
 
-        when(this.personaRepositorio.buscarPorId(1L))
-                .thenReturn(persona);
-
-        Persona resultado =
-                this.servicioBuscarPersonaPorId.ejecutar(1L);
+        Persona resultado = this.servicioBuscarPersonaPorId.ejecutar(1L);
 
         assertEquals(1L, resultado.getId());
         assertEquals("Andrew", resultado.getNombre());

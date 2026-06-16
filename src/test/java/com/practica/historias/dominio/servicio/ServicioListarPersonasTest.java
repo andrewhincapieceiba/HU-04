@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,17 +27,13 @@ class ServicioListarPersonasTest {
 
     @Test
     void debeListarTodasLasPersonasExitosamente() {
-        // ARRANGEMENT
-        List<Persona> personasFalsas = new ArrayList<>();
-        personasFalsas.add(new Persona(1L, "Carlos", "Alvarez", "carlos@mail.com", LocalDate.of(1995, 4, 12)));
-        personasFalsas.add(new Persona(2L, "Andrew", "Gomez", "andrew@mail.com", LocalDate.of(2000, 1, 1)));
+        Persona personaUno = new Persona(1L, "Carlos", "Alvarez", "carlos@mail.com", LocalDate.of(1995, 4, 12));
+        Persona personaDos = new Persona(2L, "Andrew", "Gomez", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        when(this.personaRepositorio.listarTodos()).thenReturn(personasFalsas);
+        when(this.personaRepositorio.listarTodos()).thenReturn(Arrays.asList(personaUno, personaDos));
 
-        // ACT
         List<Persona> resultado = this.servicioListarPersonas.ejecutar();
 
-        // ASSERT
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals("Alvarez", resultado.get(0).getApellido());

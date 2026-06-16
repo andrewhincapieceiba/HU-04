@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface JpaPersonaRepositorio extends JpaRepository<PersonaEntity, Long> {
-    // Genera automáticamente la consulta: SELECT * FROM ... ORDER BY apellido ASC
+
     List<PersonaEntity> findAllByOrderByApellidoAsc();
 }

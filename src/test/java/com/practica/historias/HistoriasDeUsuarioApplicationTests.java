@@ -1,13 +1,11 @@
 package com.practica.historias;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class HistoriasDeUsuarioApplicationTests {
+class HistoriasDeUsuarioApplicationTest {
 
     @Test
-    void contextLoads() {
+    void debeEjecutarMain() {
+        HistoriasDeUsuarioApplication.main(new String[]{});
     }
-
 }

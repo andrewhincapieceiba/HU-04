@@ -10,4 +10,8 @@ public interface PersonaRepositorio {
     List<Persona> listarTodos();
 
     Persona buscarPorId(Long id);
+
+    Persona actualizar(Long id, Persona persona);
+
+    void eliminar(Long id);
 }

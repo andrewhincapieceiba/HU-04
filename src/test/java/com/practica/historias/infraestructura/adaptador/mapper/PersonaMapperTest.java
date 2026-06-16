@@ -6,24 +6,24 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PersonaMapperTest {
 
     private final PersonaMapper personaMapper = new PersonaMapper();
 
     @Test
+    void debeInstanciarMapperCorrectamente() {
+        PersonaMapper mapper = new PersonaMapper();
+        assertNotNull(mapper);
+    }
+
+    @Test
     void debeConvertirDominioAEntidad() {
+        Persona persona = new Persona(1L, "Andrew", "Hincapie", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        Persona persona = new Persona(
-                1L,
-                "Andrew",
-                "Hincapie",
-                "andrew@mail.com",
-                LocalDate.of(2000, 1, 1)
-        );
-
-        PersonaEntity entidad = personaMapper.aEntidad(persona);
+        PersonaEntity entidad = this.personaMapper.aEntidad(persona);
 
         assertNotNull(entidad);
         assertEquals(1L, entidad.getId());
@@ -35,7 +35,6 @@ class PersonaMapperTest {
 
     @Test
     void debeConvertirEntidadADominio() {
-
         PersonaEntity entidad = new PersonaEntity();
         entidad.setId(2L);
         entidad.setNombre("Luis");
@@ -43,7 +42,7 @@ class PersonaMapperTest {
         entidad.setEmail("luis@mail.com");
         entidad.setFechaNacimiento(LocalDate.of(1997, 1, 13));
 
-        Persona persona = personaMapper.aDominio(entidad);
+        Persona persona = this.personaMapper.aDominio(entidad);
 
         assertNotNull(persona);
         assertEquals(2L, persona.getId());

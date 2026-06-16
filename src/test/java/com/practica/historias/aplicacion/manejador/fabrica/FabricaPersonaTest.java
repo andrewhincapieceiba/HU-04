@@ -7,24 +7,24 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FabricaPersonaTest {
 
     private final FabricaPersona fabricaPersona = new FabricaPersona();
 
     @Test
+    void debeInstanciarFabricaCorrectamente() {
+        FabricaPersona fabrica = new FabricaPersona();
+        assertNotNull(fabrica);
+    }
+
+    @Test
     void debeCrearPersonaDesdeDto() {
+        PersonaDTO dto = new PersonaDTO(1L, "Andrew", "Hincapie", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        PersonaDTO dto = new PersonaDTO(
-                1L,
-                "Andrew",
-                "Hincapie",
-                "andrew@mail.com",
-                LocalDate.of(2000, 1, 1)
-        );
-
-        Persona persona = fabricaPersona.crear(dto);
+        Persona persona = this.fabricaPersona.crear(dto);
 
         assertNotNull(persona);
         assertEquals(dto.getId(), persona.getId());
@@ -36,16 +36,9 @@ class FabricaPersonaTest {
 
     @Test
     void debeCrearDtoDesdePersona() {
+        Persona persona = new Persona(1L, "Andrew", "Hincapie", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        Persona persona = new Persona(
-                1L,
-                "Andrew",
-                "Hincapie",
-                "andrew@mail.com",
-                LocalDate.of(2000, 1, 1)
-        );
-
-        PersonaDTO dto = fabricaPersona.crearDTO(persona);
+        PersonaDTO dto = this.fabricaPersona.crearDTO(persona);
 
         assertNotNull(dto);
         assertEquals(persona.getId(), dto.getId());

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class FabricaPersona {
 
-    // Convierte de DTO (Vista/API) a Modelo de Dominio (Negocio)
     public Persona crear(PersonaDTO dto) {
         return new Persona(
                 dto.getId(),
@@ -18,7 +17,6 @@ public class FabricaPersona {
         );
     }
 
-    // Convierte de Modelo de Dominio (Negocio) a DTO (Vista/API)
     public PersonaDTO crearDTO(Persona persona) {
         return new PersonaDTO(
                 persona.getId(),
