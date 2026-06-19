@@ -1,6 +1,9 @@
 package com.practica.historias.dominio.puerto;
 
+import com.practica.historias.dominio.modelo.PaginaResultado;
 import com.practica.historias.dominio.modelo.Persona;
+import com.practica.historias.dominio.modelo.PersonaSearchCriteria;
+
 import java.util.List;
 
 public interface PersonaRepositorio {
@@ -14,4 +17,6 @@ public interface PersonaRepositorio {
     Persona actualizar(Long id, Persona persona);
 
     void eliminar(Long id);
+
+    PaginaResultado<Persona> buscarAvanzado(PersonaSearchCriteria criterios, int page, int size, String sort, String direction);
 }

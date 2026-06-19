@@ -49,7 +49,7 @@ class ManejadorCrearPersonaTest {
 
         PersonaDTO dtoInvalido = new PersonaDTO(null, "   ", "Hincapie", "andrew@mail.com", LocalDate.of(2000, 1, 1));
 
-        // Verificamos que al ejecutar el manejador se envie la ExcepcionNegocio
+
         assertThrows(ExcepcionNegocio.class, () -> {
             this.manejadorCrearPersona.ejecutar(dtoInvalido);
         });

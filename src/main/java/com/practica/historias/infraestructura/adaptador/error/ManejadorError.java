@@ -21,7 +21,7 @@ public class ManejadorError {
     private static final Logger log = LoggerFactory.getLogger(ManejadorError.class);
 
     private static final String MENSAJE_ERROR_FORMATO = "Error en el formato de los datos";
-    private static final String MENSAJE_ERROR_GENERICO = "Ocurrió un error inesperado en el servidor";
+    private static final String MENSAJE_ERROR_GENERICO = "Ocurrió un error inesperado en el servidor. Por favor, intente más tarde.";
     private static final String CLAVE_MENSAJE = "mensaje";
 
     @ExceptionHandler(ExcepcionNegocio.class)
@@ -68,8 +68,9 @@ public class ManejadorError {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> manejarErrorGenerico(Exception excepcion) {
-        // Registro estructurado del error interno en la consola del servidor
+        // Registro estructurado y seguro del error interno en los logs internos del servidor
         log.error("Error inesperado en el servidor: ", excepcion);
+
 
         return new ResponseEntity<>(
                 Collections.singletonMap(CLAVE_MENSAJE, MENSAJE_ERROR_GENERICO),

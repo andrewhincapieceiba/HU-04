@@ -1,11 +1,18 @@
 package com.practica.historias.infraestructura.adaptador.servicio;
 
 import com.practica.historias.dominio.excepcion.ExcepcionRecursoNoEncontrado;
+import com.practica.historias.dominio.modelo.PaginaResultado;
 import com.practica.historias.dominio.modelo.Persona;
+import com.practica.historias.dominio.modelo.PersonaSearchCriteria;
 import com.practica.historias.dominio.puerto.PersonaRepositorio;
 import com.practica.historias.infraestructura.adaptador.entidad.PersonaEntity;
 import com.practica.historias.infraestructura.adaptador.mapper.PersonaMapper;
 import com.practica.historias.infraestructura.adaptador.repositorio.JpaPersonaRepositorio;
+import com.practica.historias.infraestructura.adaptador.repositorio.PersonaSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,6 +50,22 @@ public class PersonaAdaptadorServicio implements PersonaRepositorio {
     public Persona buscarPorId(Long id) {
         PersonaEntity entidad = this.buscarEntidadPorId(id);
         return this.personaMapper.aDominio(entidad);
+    }
+
+    @Override
+    public PaginaResultado<Persona> buscarAvanzado(PersonaSearchCriteria criterios, int pagina, int tamano, String ordenarPor, String direccion) {
+        // Corregido: Ahora evalúa 'direccion' en español de forma consistente
+        Sort sort = direccion.equalsIgnoreCase("desc") ? Sort.by(ordenarPor).descending() : Sort.by(ordenarPor).ascending();
+        Pageable pageable = PageRequest.of(pagina, tamano, sort);
+
+        Page<PersonaEntity> resultadoPage = this.jpaPersonaRepositorio.findAll(PersonaSpecification.conCriterios(criterios), pageable);
+
+        List<Persona> listaPersonas = resultadoPage.getContent()
+                .stream()
+                .map(entidad -> this.personaMapper.aDominio(entidad))
+                .collect(Collectors.toList());
+
+        return new PaginaResultado<>(listaPersonas, resultadoPage.getTotalElements(), resultadoPage.getTotalPages(), resultadoPage.getNumber());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.practica.historias.infraestructura.adaptador.servicio;
 
-import com.practica.historias.dominio.excepcion.ExcepcionNegocio;
+import com.practica.historias.dominio.excepcion.ExcepcionRecursoNoEncontrado;
 import com.practica.historias.dominio.modelo.Persona;
 import com.practica.historias.infraestructura.adaptador.entidad.PersonaEntity;
 import com.practica.historias.infraestructura.adaptador.mapper.PersonaMapper;
@@ -81,11 +81,27 @@ class PersonaAdaptadorServicioTest {
     void debeLanzarExcepcionCuandoPersonaNoExiste() {
         when(this.jpaPersonaRepositorio.findById(99L)).thenReturn(Optional.empty());
 
-        ExcepcionNegocio excepcion = assertThrows(ExcepcionNegocio.class, () ->
+        ExcepcionRecursoNoEncontrado excepcion = assertThrows(ExcepcionRecursoNoEncontrado.class, () ->
                 this.personaAdaptadorServicio.buscarPorId(99L)
         );
 
         assertEquals("Persona no encontrada", excepcion.getMessage());
+    }
+
+    @Test
+    void debeActualizarPersonaCorrectamente() {
+        PersonaEntity entidadExistente = crearEntidad(1L, "Andrew", "Hincapie", "andrew@mail.com", 2000, 1, 1);
+        Persona personaNueva = new Persona(1L, "Andrew", "Hincapie Actualizado", "andrew.nuevo@mail.com", LocalDate.of(2000, 1, 1));
+        PersonaEntity entidadActualizada = crearEntidad(1L, "Andrew", "Hincapie Actualizado", "andrew.nuevo@mail.com", 2000, 1, 1);
+
+        when(this.jpaPersonaRepositorio.findById(1L)).thenReturn(Optional.of(entidadExistente));
+        when(this.jpaPersonaRepositorio.save(any(PersonaEntity.class))).thenReturn(entidadActualizada);
+
+        Persona resultado = this.personaAdaptadorServicio.actualizar(1L, personaNueva);
+
+        assertNotNull(resultado);
+        assertEquals("Hincapie Actualizado", resultado.getApellido());
+        assertEquals("andrew.nuevo@mail.com", resultado.getEmail());
     }
 
     @Test
@@ -106,20 +122,5 @@ class PersonaAdaptadorServicioTest {
         entidad.setEmail(email);
         entidad.setFechaNacimiento(LocalDate.of(anio, mes, dia));
         return entidad;
-    }
-    @Test
-    void debeActualizarPersonaCorrectamente() {
-        PersonaEntity entidadExistente = crearEntidad(1L, "Andrew", "Hincapie", "andrew@mail.com", 2000, 1, 1);
-        Persona personaNueva = new Persona(1L, "Andrew", "Hincapie Actualizado", "andrew.nuevo@mail.com", LocalDate.of(2000, 1, 1));
-        PersonaEntity entidadActualizada = crearEntidad(1L, "Andrew", "Hincapie Actualizado", "andrew.nuevo@mail.com", 2000, 1, 1);
-
-        when(this.jpaPersonaRepositorio.findById(1L)).thenReturn(Optional.of(entidadExistente));
-        when(this.jpaPersonaRepositorio.save(any(PersonaEntity.class))).thenReturn(entidadActualizada);
-
-        Persona resultado = this.personaAdaptadorServicio.actualizar(1L, personaNueva);
-
-        assertNotNull(resultado);
-        assertEquals("Hincapie Actualizado", resultado.getApellido());
-        assertEquals("andrew.nuevo@mail.com", resultado.getEmail());
     }
 }
