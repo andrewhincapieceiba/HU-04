@@ -9,7 +9,7 @@ public class FabricaPersona {
 
     public Persona crear(PersonaDTO dto) {
         return new Persona(
-                dto.getId(),
+                null, //
                 dto.getNombre(),
                 dto.getApellido(),
                 dto.getEmail(),

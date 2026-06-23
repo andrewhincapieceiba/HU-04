@@ -1,5 +1,6 @@
 package com.practica.historias.infraestructura.adaptador.servicio;
 
+import com.practica.historias.dominio.excepcion.ExcepcionNegocio;
 import com.practica.historias.dominio.excepcion.ExcepcionRecursoNoEncontrado;
 import com.practica.historias.dominio.modelo.PaginaResultado;
 import com.practica.historias.dominio.modelo.Persona;
@@ -54,7 +55,6 @@ public class PersonaAdaptadorServicio implements PersonaRepositorio {
 
     @Override
     public PaginaResultado<Persona> buscarAvanzado(PersonaSearchCriteria criterios, int pagina, int tamano, String ordenarPor, String direccion) {
-        // Corregido: Ahora evalúa 'direccion' en español de forma consistente
         Sort sort = direccion.equalsIgnoreCase("desc") ? Sort.by(ordenarPor).descending() : Sort.by(ordenarPor).ascending();
         Pageable pageable = PageRequest.of(pagina, tamano, sort);
 
@@ -71,6 +71,14 @@ public class PersonaAdaptadorServicio implements PersonaRepositorio {
     @Override
     public Persona actualizar(Long id, Persona persona) {
         PersonaEntity entidadExistente = this.buscarEntidadPorId(id);
+
+        // 💡 CORRECCIÓN M4: Validar la unicidad del email únicamente si este fue modificado
+        if (!entidadExistente.getEmail().equalsIgnoreCase(persona.getEmail())) {
+            boolean emailYaExiste = this.jpaPersonaRepositorio.existsByEmail(persona.getEmail());
+            if (emailYaExiste) {
+                throw new ExcepcionNegocio("El email ya está registrado por otra persona");
+            }
+        }
 
         entidadExistente.setNombre(persona.getNombre());
         entidadExistente.setApellido(persona.getApellido());

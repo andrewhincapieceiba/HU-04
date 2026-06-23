@@ -1,4 +1,4 @@
-package com.practica.historias.dominio.validacion;
+package com.practica.historias.infraestructura.adaptador.validacion;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
