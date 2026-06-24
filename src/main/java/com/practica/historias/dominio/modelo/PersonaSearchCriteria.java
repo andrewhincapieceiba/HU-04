@@ -13,7 +13,6 @@ public class PersonaSearchCriteria {
         this.edadMax = edadMax;
     }
 
-    // Geters
     public String getNombre() { return nombre; }
     public String getApellido() { return apellido; }
     public Integer getEdadMin() { return edadMin; }

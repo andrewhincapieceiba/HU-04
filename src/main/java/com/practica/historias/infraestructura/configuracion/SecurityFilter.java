@@ -7,11 +7,16 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
 public class SecurityFilter implements Filter {
+
+
+    @Value("${cors.allowed-origin}")
+    private String allowedOrigin;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -30,13 +35,15 @@ public class SecurityFilter implements Filter {
             }
         }
 
+
         httpResponse.setHeader("X-Frame-Options", "DENY");
         httpResponse.setHeader("X-Content-Type-Options", "nosniff");
         httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
         httpResponse.setHeader("Content-Security-Policy", "default-src 'self'");
         httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
 
-        httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+
+        httpResponse.setHeader("Access-Control-Allow-Origin", this.allowedOrigin);
         httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         httpResponse.setHeader("Access-Control-Max-Age", "3600");

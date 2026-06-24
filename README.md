@@ -8,7 +8,7 @@ Este proyecto consiste en una API REST robusta construida con **Spring Boot 3**,
 
 * **Java versión:** 17+ configurado mediante la variable de entorno `JAVA_HOME`.
 * **IDE Recomendado:** IntelliJ IDEA.
-* **Gestor de Dependencias:** **Gradle** (Seleccionado en reemplazo de Maven por optimización de tiempos de compilación, flexibilidad en tareas automatizadas y legibilidad superior en el script de construcción `build.gradle`).
+* **Gestor de Dependencias:** **Gradle** (Seleccionado deliberadamente en reemplazo de Maven debido a su rendimiento superior mediante la compilación incremental y el caché intermedio, flexibilidad extrema para automatizar tareas y una legibilidad significativamente superior en el script de construcción `build.gradle` en comparación con los extensos archivos XML de Maven).
 * **Base de Datos:** PostgreSQL para entornos locales/producción y H2 Database en memoria para la ejecución automatizada y aislada de la suite de pruebas.
 
 ---
@@ -29,6 +29,7 @@ graph LR
 
 subgraph Infrastructure [Capa de Infraestructura]
 A[PersonaControlador]
+X[DiagnosticoControlador]
 B[PersonaAdaptadorServicio]
 C[JpaPersonaRepositorio]
 M[PersonaSpecification]

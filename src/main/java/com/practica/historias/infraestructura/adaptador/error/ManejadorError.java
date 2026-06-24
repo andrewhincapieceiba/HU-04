@@ -21,7 +21,7 @@ public class ManejadorError {
     private static final Logger log = LoggerFactory.getLogger(ManejadorError.class);
 
     private static final String MENSAJE_ERROR_FORMATO = "Error en el formato de los datos";
-    private static final String MENSAJE_ERROR_GENERICO = "Ocurrió un error inesperado en el servidor. Por favor, intente más tarde.";
+    private static final String MENSAJE_ERROR_GENERICO = "Ocurrió un error inesperado en el servidor";
     private static final String CLAVE_MENSAJE = "mensaje";
 
     @ExceptionHandler(ExcepcionNegocio.class)
@@ -54,23 +54,40 @@ public class ManejadorError {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> manejarErrorJson(HttpMessageNotReadableException excepcion) {
-        String mensaje = excepcion.getMostSpecificCause().getMessage();
+        Throwable causa = excepcion.getCause();
 
-        if (mensaje == null || mensaje.isBlank() || mensaje.contains("Cannot deserialize") || mensaje.contains("Unexpected char") || mensaje.contains("JSON")) {
-            mensaje = MENSAJE_ERROR_FORMATO;
+        if (causa == null) {
+            return new ResponseEntity<>(
+                    Collections.singletonMap(CLAVE_MENSAJE, MENSAJE_ERROR_FORMATO),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        while (causa.getCause() != null) {
+            causa = causa.getCause();
+        }
+
+        String mensajeCausa = causa.getMessage();
+        String mensajeFinal;
+
+        if (mensajeCausa == null || mensajeCausa.isBlank()) {
+            mensajeFinal = MENSAJE_ERROR_FORMATO;
+        } else if (mensajeCausa.contains("problem:")) {
+            mensajeFinal = mensajeCausa.substring(mensajeCausa.indexOf("problem:") + 8).trim();
+        } else {
+            mensajeFinal = mensajeCausa;
         }
 
         return new ResponseEntity<>(
-                Collections.singletonMap(CLAVE_MENSAJE, mensaje),
+                Collections.singletonMap(CLAVE_MENSAJE, mensajeFinal),
                 HttpStatus.BAD_REQUEST
         );
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> manejarErrorGenerico(Exception excepcion) {
-        // Registro estructurado y seguro del error interno en los logs internos del servidor
+        // 💡 CORRECCIÓN m7: Se remueve el comentario redundante sobre el uso de logs internos del servidor
         log.error("Error inesperado en el servidor: ", excepcion);
-
 
         return new ResponseEntity<>(
                 Collections.singletonMap(CLAVE_MENSAJE, MENSAJE_ERROR_GENERICO),
